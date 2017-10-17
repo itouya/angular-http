@@ -1,11 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import { HeroService } from './hero.service';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 
-class Hero {
-  id: number;
-  name: string;
-  account_image: string;
-}
+import { Hero } from './hero';
 
 @Component({
   selector: 'app-root',
@@ -16,12 +13,20 @@ export class AppComponent implements OnInit {
   title = 'app';
   results: Hero[];
 
-  constructor(private http: HttpClient ) {}
+  constructor(private http: HttpClient,
+              private heroService: HeroService ) {}
 
   ngOnInit(): void {
-    this.http.get('http://localhost:8080/api/hero') .subscribe((data: Hero[]) => {
-      console.log(data);
-      this.results = data;
-    });
+    this.heroService.getHeroes()
+                    .subscribe(
+                      (data) => {
+                        this.results = data;
+                      },
+                      (err: HttpErrorResponse) => {
+                        console.log('err.error: ', err.error);
+                        console.log('err.message: ', err.message);
+                        console.log('err.name: ', err.name);
+                        console.log(`Backend returned code ${err.status}, body was: ${err.error}`);
+                      });
   }
 }
